@@ -1,8 +1,8 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
-    REPO OpenMathLib/OpenBLAS
-    REF "v${VERSION}"
-    SHA512 4accc5282244946157b7940211181e011940154ff47855702c68f57a0af2fa5a306f49e47b8c22c02eeff61760c6c220465f05a316a33ee3265bfce65ca4cb84
+    REPO JAicewizard/OpenBLAS
+    REF "cea4abcac0cc37cea6e89daec282721218196e30"
+	SHA512 a47d226260abdbeb29a59bbe87799e1fe4dc551f54f6d369c3b8c2affcd7b13fd73913916db0ad8eaf10f8e53b45d3211f5a31d6b2bc550039d87231985df51a
     HEAD_REF develop
     PATCHES
         uwp.patch
@@ -32,12 +32,24 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
 )
 
 set(COMMON_OPTIONS -DBUILD_WITHOUT_LAPACK=ON)
-
+#In case other targets are desired, allow specifying them via features (?)
+if(VCPKG_CROSSCOMPILING)
+    if(VCPKG_TARGET_ARCHITECTURE STREQUAL "x64")
+        list(APPEND COMMON_OPTIONS -DTARGET=HASWELL)
+    endif()
+endif()
+ 
 if(VCPKG_TARGET_IS_OSX)
     list(APPEND COMMON_OPTIONS -DONLY_CBLAS=1)
     if("dynamic-arch" IN_LIST FEATURES)
         set(conf_opts GENERATOR "Unix Makefiles")
     endif()
+endif()
+
+
+if(VCPKG_TARGET_IS_EMSCRIPTEN)
+	list(APPEND COMMON_OPTIONS -DTARGET=RISCV64_GENERIC)
+	list(APPEND COMMON_OPTIONS -DEMSCRIPTEN_SYSTEM_PROCESSOR=riscv64)
 endif()
 
 if(VCPKG_TARGET_IS_ANDROID)
