@@ -113,7 +113,7 @@ set(LAPACK95_FOUND FALSE)
 # store original values for CMAKE_FIND_LIBRARY_SUFFIXES
 set(_lapack_ORIG_CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    list(APPEND CMAKE_FIND_LIBRARY_SUFFIXES .so.3gfs .so.3 .so.4 .so.5)
+	list(APPEND CMAKE_FIND_LIBRARY_SUFFIXES .so.3gfs .so.3 .so.4 .so.5)
 endif()
 
 # TODO: move this stuff to a separate module
@@ -188,7 +188,8 @@ macro(CHECK_LAPACK_LIBRARIES LIBRARIES _prefix _name _flags _list _threadlibs _a
   else()
     set(${LIBRARIES} FALSE)
   endif()
-  #message("DEBUG: ${LIBRARIES} = ${${LIBRARIES}}")
+
+  # message("DEBUG: ${LIBRARIES} = ${${LIBRARIES}}")
 endmacro()
 
 set(LAPACK_LINKER_FLAGS)
@@ -272,7 +273,8 @@ if(BLAS_FOUND)
           file(TO_CMAKE_PATH "$ENV{MKLROOT}" LAPACK_mkl_MKLROOT)
           # If MKLROOT points to the subdirectory 'mkl', use the parent directory instead
           # so we can better detect other relevant libraries in 'compiler' or 'tbb':
-          get_filename_component(LAPACK_mkl_MKLROOT_LAST_DIR "${LAPACK_mkl_MKLROOT}" NAME)
+    	  get_filename_component(LAPACK_mkl_MKLROOT_LAST_DIR "${LAPACK_mkl_MKLROOT}" NAME)
+
           if(LAPACK_mkl_MKLROOT_LAST_DIR STREQUAL "mkl")
               get_filename_component(LAPACK_mkl_MKLROOT "${LAPACK_mkl_MKLROOT}" DIRECTORY)
           endif()
@@ -466,13 +468,26 @@ if(BLAS_FOUND)
         "${BLAS_LIBRARIES}"
       )
     endif()
-    if(NOT LAPACK_LIBRARIES AND NOT WIN32)
+    if(NOT LAPACK_LIBRARIES)
       check_lapack_libraries(
         LAPACK_LIBRARIES
         LAPACK
         cheev
         ""
         "lapack;m;gfortran"
+        ""
+        ""
+        ""
+        "${BLAS_LIBRARIES}"
+      )
+    endif()
+    if(NOT LAPACK_LIBRARIES)
+      check_lapack_libraries(
+        LAPACK_LIBRARIES
+        LAPACK
+        cheev
+        ""
+        "lapack;m;gfortran;quadmath"
         ""
         ""
         ""
